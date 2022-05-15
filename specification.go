@@ -110,7 +110,7 @@ func (f *BetterFilter) Filter(
 	return result
 }
 
-func main() {
+func main_function() {
 	apple := Product{name: "apple", color: green, size: small}
 	tree := Product{"Tree", green, large}
 	house := Product{"House", blue, large}
