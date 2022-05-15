@@ -88,5 +88,5 @@ func (mfm MultifunctionMachine) Scan(d Document) {
 	mfm.scanner.Scan(d)
 }
 
-func main_function() {
+func main() {
 }
