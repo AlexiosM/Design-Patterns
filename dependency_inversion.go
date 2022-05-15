@@ -6,6 +6,10 @@ import "fmt"
 // HLM should not depend on LLM
 // Both should depend on abstractions
 
+// Typically by LLM we mean what is closer to the hardware/data storage
+// and HLM would be the Business Logic stuff.
+// Both should depend on abstratctions --> Interfaces in Go
+
 type Relationship int
 
 const (
@@ -24,9 +28,26 @@ type Info struct {
 	to           *Person
 }
 
+// abstraction
+type RelationshipBrowser interface {
+	FindAllChildrenOf(name string) []*Person
+}
+
 // Low-level Module (since it is a kind of storage)
 type Relationships struct {
 	relations []Info
+}
+
+func (r *Relationships) FindAllChildrenOf(name string) []*Person {
+	result := make([]*Person, 0)
+
+	for i, v := range r.relations {
+		if v.relationship == Parent &&
+			v.from.name == name {
+			result = append(result, r.relations[i].to)
+		}
+	}
+	return result
 }
 
 func (r *Relationships) AddParentAndChild(
@@ -39,17 +60,12 @@ func (r *Relationships) AddParentAndChild(
 // we want to be able to research on the above data
 // High-level Module
 type Research struct {
-	// break DIP
-	relationships Relationships //--> this way the LLM depends on HLM, we don't want that
+	browser RelationshipBrowser
 }
 
 func (r *Research) Investigate() {
-	relations := r.relationships.relations
-	for _, rel := range relations {
-		if rel.from.name == "John" &&
-			rel.relationship == Parent {
-			fmt.Println("John has a child called ", rel.to.name)
-		}
+	for _, p := range r.browser.FindAllChildrenOf("John") {
+		fmt.Println("Jong has chiled called :", p.name)
 	}
 }
 
@@ -62,6 +78,6 @@ func main() {
 	relationships.AddParentAndChild(&parent, &child1)
 	relationships.AddParentAndChild(&parent, &child2)
 
-	r := Research{relationships}
+	r := Research{&relationships}
 	r.Investigate()
 }
