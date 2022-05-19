@@ -38,8 +38,41 @@ func UseIt(sized Sized) {
 	fmt.Print("Expected area of: ", expectedArea, ", but got: ", actualArea, "\n")
 }
 
+// Let's now create a Square that would be of type Sized too
+type Square struct {
+	Rectangle // it will force the idea of widht to be equal to height
+}
+
+func NewSquare(size int) *Square {
+	sq := Square{}
+	sq.width = size
+	sq.height = size
+	return &sq
+}
+
+// The part that VIOLATES the Liscov Substitution Principle is that there are methods
+// for setWidth setHeight that set both width and height
+func (s *Square) SetWidth(width int) {
+	s.width = width
+	s.height = width
+}
+func (s *Square) SetHeight(height int) {
+	s.height = height
+	s.width = height
+}
+
+// The problem is that UseIt function is expecting something up the hierarchy (interface)
+// as an argument. It should continue to work even if we proceed to extend objects
+// (here we extended the rectangle and created a square object)
+
 func main() {
 	rc := Rectangle{2, 3}
 	UseIt(&rc)
 
+	sq := NewSquare(5)
+	UseIt(sq)
+
 }
+
+// Expected area of: 20, but got: 20
+// Expected area of: 50, but got: 100   --> because the call to setHeight not only set the height but also set the width
