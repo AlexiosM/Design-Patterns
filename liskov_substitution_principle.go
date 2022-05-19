@@ -65,6 +65,18 @@ func (s *Square) SetHeight(height int) {
 // as an argument. It should continue to work even if we proceed to extend objects
 // (here we extended the rectangle and created a square object)
 
+// !!! The behavior of implementers of a particular type (Sized interface) should not break
+// the core fundamental behaviors that you rely on
+
+// A solution could be to create a Square type as below
+type Square2 struct {
+	size int // height, width
+}
+
+func (s *Square2) Rectangle() Rectangle {
+	return Rectangle{s.size, s.size}
+}
+
 func main() {
 	rc := Rectangle{2, 3}
 	UseIt(&rc)
